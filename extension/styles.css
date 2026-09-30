@@ -129,11 +129,13 @@
   align-items: center;
   justify-content: space-between;
   gap: 12px;
-  padding: 7px 14px;
+  margin: 6px 0;
+  padding: 11px 16px;
   color: var(--slop-bait);
-  background: color-mix(in srgb, currentColor 7%, transparent);
-  border-left: 3px solid currentColor;
-  font: 700 11px/1.3 "Helvetica Neue", Inter, system-ui, sans-serif;
+  background: color-mix(in srgb, currentColor 14%, #fffcf6);
+  border: 2px solid currentColor;
+  border-radius: 8px;
+  font: 800 13px/1.3 "Helvetica Neue", Inter, system-ui, sans-serif;
   letter-spacing: 0.08em;
   text-transform: uppercase;
 }
@@ -141,16 +143,15 @@
 .slop-killbar button {
   all: unset;
   cursor: pointer;
-  padding: 2px 8px;
-  border: 1px solid currentColor;
+  padding: 4px 12px;
+  border: 2px solid currentColor;
   border-radius: 999px;
-  font-size: 10px;
+  font-size: 11px;
   letter-spacing: 0.1em;
-  opacity: 0.75;
 }
 
 .slop-killbar button:hover,
-.slop-killbar button:focus-visible { opacity: 1; }
+.slop-killbar button:focus-visible { background: color-mix(in srgb, currentColor 18%, transparent); }
 
 [data-slop="pending"] { opacity: 0.6; transition: opacity 160ms ease-out; }
 

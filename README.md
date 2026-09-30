@@ -54,16 +54,21 @@ Every signal is a Jev `noul` with two thresholds, in `server/jev.js`:
 
 | Platform | Signal | Stamp | Kill | Label |
 |---|---|---|---|---|
-| LinkedIn | `is_corporate_slop` | 0.70 | 0.90 | CORP |
-| LinkedIn | `is_slop` | 0.60 | 0.80 | BAIT / BRAG |
-| LinkedIn | `is_ai_written` | 0.70 | 0.90 | AI |
+| LinkedIn | `is_corporate_slop` | 0.70 | 0.70 | CORP |
+| LinkedIn | `is_slop` | 0.60 | 0.60 | BAIT / BRAG |
+| LinkedIn | `is_ai_written` | 0.70 | 0.70 | AI |
 | X | `is_promo` | 0.70 | 0.90 | SHILL |
 | X | `is_slop` | 0.60 | 0.80 | BAIT |
 | X | `is_ai_written` | 0.70 | 0.90 | AI |
 
-Kill sits higher than stamp because hiding a real post costs more than
-stamping one. Local rule verdicts need two independent phrase hits, so they
-kill too.
+On X, kill sits higher than stamp because hiding a real post costs more than
+stamping one. On LinkedIn a higher kill line left about 9 in 10 flagged posts
+stamped but visible, and the stamp lines flag no genuine sample, so LinkedIn
+kills at the stamp line. Local rule verdicts need two independent phrase hits,
+so they kill too.
+
+The server logs one line per flagged post (`[linkedin] kill  AI    0.85 ...`),
+so thresholds can be checked against your real feed.
 
 ## Accuracy
 
@@ -72,7 +77,7 @@ Measured on 32 labelled samples (`test/samples/`), raw answers in
 
 | Platform | Slop caught | Slop killed | Genuine stamped | Genuine killed | Batch latency |
 |---|---|---|---|---|---|
-| LinkedIn (14) | 8/8 | 5/8 | 0/4 | 0/4 | 763ms for 14 in parallel |
+| LinkedIn (14) | 8/8 | 8/8 | 0/4 | 0/4 | 763ms for 14 in parallel |
 | X (18) | 10/10 | 7/10 | 0/6 | 0/6 | 474ms for 18 in parallel |
 
 Highest score any genuine post got on any signal: 0.63 (`is_corporate_slop`

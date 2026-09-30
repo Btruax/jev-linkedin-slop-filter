@@ -36,6 +36,11 @@ const classify = async (text, platform) => {
 
   const result = await judge(platform, text, API_KEY);
   stats.jev += 1;
+  // One line per flagged post, so thresholds can be checked against the real feed.
+  if (result.verdict === 'hide') {
+    const action = result.kill ? 'kill ' : 'stamp';
+    console.log(`[${platform}] ${action} ${result.label.padEnd(5)} ${result.score.toFixed(2)}  ${text.replace(/\s+/g, ' ').slice(0, 60)}`);
+  }
   return remember(key, result);
 };
 

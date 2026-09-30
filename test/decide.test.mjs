@@ -23,17 +23,18 @@ test('linkedin: nothing over a stamp threshold is shown', () => {
   assert.deepEqual(v.scores, { is_corporate_slop: 0.2, is_slop: 0.3, is_ai_written: 0.4 });
 });
 
-test('linkedin: bait between stamp and kill is stamped, not killed', () => {
-  const v = decide(PLATFORMS.linkedin, li(0.7, 0.1, 0.1));
+test('linkedin: anything stamped is also killed', () => {
+  const v = decide(PLATFORMS.linkedin, li(0.6, 0.1, 0.1));
   assert.equal(v.verdict, 'hide');
-  assert.equal(v.kill, false);
+  assert.equal(v.kill, true);
   assert.equal(v.label, 'Bait');
-  assert.equal(v.score, 0.7);
+  assert.equal(v.score, 0.6);
 });
 
-test('linkedin: bait at or over kill threshold is killed', () => {
-  const v = decide(PLATFORMS.linkedin, li(0.8, 0.1, 0.1));
-  assert.equal(v.kill, true);
+test('x: bait between stamp and kill is stamped, not killed', () => {
+  const v = decide(PLATFORMS.x, x(0.7, 0.1, 0.1));
+  assert.equal(v.verdict, 'hide');
+  assert.equal(v.kill, false);
   assert.equal(v.label, 'Bait');
 });
 
@@ -49,10 +50,10 @@ test('linkedin: humblebrag category turns a Bait stamp into Brag', () => {
   assert.equal(v.label, 'Brag');
 });
 
-test('linkedin: AI-only post gets an AI stamp', () => {
+test('linkedin: AI-only post gets an AI label and is killed', () => {
   const v = decide(PLATFORMS.linkedin, li(0.2, 0.1, 0.75));
   assert.equal(v.label, 'AI');
-  assert.equal(v.kill, false);
+  assert.equal(v.kill, true);
 });
 
 test('x: promo is labelled Shill and has no category', () => {
@@ -69,10 +70,10 @@ test('x: every signal just under stamp shows the post', () => {
   assert.equal(v.verdict, 'show');
 });
 
-test('every signal kills only above where it stamps', () => {
+test('no signal kills below where it stamps', () => {
   for (const [name, platform] of Object.entries(PLATFORMS)) {
     for (const s of platform.signals) {
-      assert.ok(s.kill > s.stamp, `${name}.${s.id}: kill ${s.kill} <= stamp ${s.stamp}`);
+      assert.ok(s.kill >= s.stamp, `${name}.${s.id}: kill ${s.kill} < stamp ${s.stamp}`);
       assert.ok(platform.questions[s.id]?.type === 'noul', `${name}.${s.id} missing noul question`);
     }
   }

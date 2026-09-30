@@ -15,9 +15,9 @@ const AI_MARKERS =
 
 /**
  * Each platform has its own questions and signals. A signal is one noul
- * question plus two thresholds: `stamp` marks the post, `kill` collapses it.
- * Kill sits higher than stamp because hiding a real post costs more than
- * stamping one. Signals are listed in stamp-label priority order.
+ * question plus two thresholds: `stamp` marks the post, `kill` collapses it
+ * (kill mode only). Kill is never below stamp. Signals are listed in
+ * stamp-label priority order.
  */
 export const PLATFORMS = {
   linkedin: {
@@ -61,10 +61,13 @@ export const PLATFORMS = {
         },
       },
     },
+    // LinkedIn kills at the stamp line. Its stamp lines already flag no
+    // genuine sample, and a higher kill line left ~9 in 10 flagged posts
+    // stamped but visible, which is not what kill mode is for.
     signals: [
-      { id: 'is_corporate_slop', label: 'Corp', stamp: 0.7, kill: 0.9 },
-      { id: 'is_slop', label: 'Bait', stamp: 0.6, kill: 0.8 },
-      { id: 'is_ai_written', label: 'AI', stamp: 0.7, kill: 0.9 },
+      { id: 'is_corporate_slop', label: 'Corp', stamp: 0.7, kill: 0.7 },
+      { id: 'is_slop', label: 'Bait', stamp: 0.6, kill: 0.6 },
+      { id: 'is_ai_written', label: 'AI', stamp: 0.7, kill: 0.7 },
     ],
   },
 
