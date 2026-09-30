@@ -99,10 +99,12 @@ export const PLATFORMS = {
           'model and posted with little human editing? ' + AI_MARKERS,
       },
     },
+    // Same reasoning as LinkedIn: real X feeds put most flagged posts at
+    // 0.6-0.8, so a higher kill line only ever stamped them.
     signals: [
-      { id: 'is_promo', label: 'Shill', stamp: 0.7, kill: 0.9 },
-      { id: 'is_slop', label: 'Bait', stamp: 0.6, kill: 0.8 },
-      { id: 'is_ai_written', label: 'AI', stamp: 0.7, kill: 0.9 },
+      { id: 'is_promo', label: 'Shill', stamp: 0.7, kill: 0.7 },
+      { id: 'is_slop', label: 'Bait', stamp: 0.6, kill: 0.6 },
+      { id: 'is_ai_written', label: 'AI', stamp: 0.7, kill: 0.7 },
     ],
   },
 };

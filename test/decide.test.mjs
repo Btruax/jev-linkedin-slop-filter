@@ -31,10 +31,10 @@ test('linkedin: anything stamped is also killed', () => {
   assert.equal(v.score, 0.6);
 });
 
-test('x: bait between stamp and kill is stamped, not killed', () => {
-  const v = decide(PLATFORMS.x, x(0.7, 0.1, 0.1));
+test('x: bait at the stamp line is killed (real feeds score 0.6-0.8)', () => {
+  const v = decide(PLATFORMS.x, x(0.6, 0.1, 0.1));
   assert.equal(v.verdict, 'hide');
-  assert.equal(v.kill, false);
+  assert.equal(v.kill, true);
   assert.equal(v.label, 'Bait');
 });
 
