@@ -1,0 +1,352 @@
+[
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.35
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.06
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.49
+  },
+  "category": {
+   "type": "choice",
+   "choice": "genuine_update",
+   "confidence": 0.85,
+   "probabilities": {
+    "genuine_update": 0.89,
+    "job_or_notice": 0,
+    "engagement_bait": 0.11,
+    "humblebrag": 0
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.12
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.63
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.19
+  },
+  "category": {
+   "type": "choice",
+   "choice": "genuine_update",
+   "confidence": 0.61,
+   "probabilities": {
+    "genuine_update": 0.71,
+    "job_or_notice": 0,
+    "engagement_bait": 0,
+    "humblebrag": 0.29
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.26
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.07
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.37
+  },
+  "category": {
+   "type": "choice",
+   "choice": "genuine_update",
+   "confidence": 0.45,
+   "probabilities": {
+    "genuine_update": 0.58,
+    "humblebrag": 0.01,
+    "job_or_notice": 0,
+    "engagement_bait": 0.41
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.29
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.99
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.71
+  },
+  "category": {
+   "type": "choice",
+   "choice": "humblebrag",
+   "confidence": 0.97,
+   "probabilities": {
+    "engagement_bait": 0,
+    "genuine_update": 0.02,
+    "humblebrag": 0.98,
+    "job_or_notice": 0
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.11
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.07
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.08
+  },
+  "category": {
+   "type": "choice",
+   "choice": "genuine_update",
+   "confidence": 0.94,
+   "probabilities": {
+    "job_or_notice": 0.04,
+    "genuine_update": 0.96,
+    "engagement_bait": 0,
+    "humblebrag": 0
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.82
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.09
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.64
+  },
+  "category": {
+   "type": "choice",
+   "choice": "engagement_bait",
+   "confidence": 1,
+   "probabilities": {
+    "humblebrag": 0,
+    "engagement_bait": 1,
+    "genuine_update": 0,
+    "job_or_notice": 0
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.23
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.98
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.51
+  },
+  "category": {
+   "type": "choice",
+   "choice": "humblebrag",
+   "confidence": 0.77,
+   "probabilities": {
+    "humblebrag": 0.83,
+    "engagement_bait": 0,
+    "job_or_notice": 0.02,
+    "genuine_update": 0.15
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.36
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.98
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.6
+  },
+  "category": {
+   "type": "choice",
+   "choice": "humblebrag",
+   "confidence": 0.83,
+   "probabilities": {
+    "job_or_notice": 0.09,
+    "genuine_update": 0.04,
+    "humblebrag": 0.87,
+    "engagement_bait": 0
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.92
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.12
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.82
+  },
+  "category": {
+   "type": "choice",
+   "choice": "engagement_bait",
+   "confidence": 1,
+   "probabilities": {
+    "engagement_bait": 1,
+    "job_or_notice": 0,
+    "genuine_update": 0,
+    "humblebrag": 0
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.43
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.24
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.81
+  },
+  "category": {
+   "type": "choice",
+   "choice": "humblebrag",
+   "confidence": 0.96,
+   "probabilities": {
+    "genuine_update": 0.03,
+    "engagement_bait": 0,
+    "humblebrag": 0.97,
+    "job_or_notice": 0
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.69
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.32
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.87
+  },
+  "category": {
+   "type": "choice",
+   "choice": "engagement_bait",
+   "confidence": 1,
+   "probabilities": {
+    "humblebrag": 0,
+    "genuine_update": 0,
+    "engagement_bait": 1,
+    "job_or_notice": 0
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.57
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.1
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.84
+  },
+  "category": {
+   "type": "choice",
+   "choice": "engagement_bait",
+   "confidence": 0.91,
+   "probabilities": {
+    "job_or_notice": 0,
+    "engagement_bait": 0.9400000000000001,
+    "humblebrag": 0,
+    "genuine_update": 0.06
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.13
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.44
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.2
+  },
+  "category": {
+   "type": "choice",
+   "choice": "genuine_update",
+   "confidence": 0.97,
+   "probabilities": {
+    "job_or_notice": 0,
+    "genuine_update": 0.98,
+    "humblebrag": 0.02,
+    "engagement_bait": 0
+   }
+  }
+ },
+ {
+  "is_slop": {
+   "type": "noul",
+   "noul": 0.1
+  },
+  "is_corporate_slop": {
+   "type": "noul",
+   "noul": 0.29
+  },
+  "is_ai_written": {
+   "type": "noul",
+   "noul": 0.11
+  },
+  "category": {
+   "type": "choice",
+   "choice": "engagement_bait",
+   "confidence": 0.35,
+   "probabilities": {
+    "engagement_bait": 0.51,
+    "job_or_notice": 0.21,
+    "genuine_update": 0.28,
+    "humblebrag": 0
+   }
+  }
+ }
+]
