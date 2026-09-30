@@ -1,42 +1,22 @@
-// Watches the LinkedIn feed, sends unseen posts to the local Jev proxy,
-// and slams a stamp onto the ones that come back as slop.
+// Watches the LinkedIn or X feed, sends unseen posts to the local Jev proxy,
+// and either stamps the ones that come back as slop or kills them outright.
 
 const ENDPOINT = 'http://127.0.0.1:8787/judge';
 const BATCH_SIZE = 8;
 const BATCH_DELAY_MS = 350;
 const MIN_TEXT_LENGTH = 40;
-
-// LinkedIn hashes every class name and rotates them each build, so the only
-// durable hook is the componentkey, which still carries the feed type.
-const POST_SELECTORS = [
-  '[componentkey*="FeedType_MAIN_FEED"]',
-  'div.feed-shared-update-v2',            // older layout, harmless if absent
-  'div[data-id^="urn:li:activity"]',
-];
+const MAX_TEXT_LENGTH = 3000;
 
 // Scored with textContent (cheap, no reflow); the winner is re-read with
 // innerText because the line breaks are a slop signal in their own right.
 const TEXT_CANDIDATES = 'p, span[dir], div[dir], div, span';
 const WRAPPER_RATIO = 0.95;
-const MAX_TEXT_LENGTH = 3000;
-
-// The stamp face is decided server-side, where the thresholds live.
-
-const seen = new WeakSet();
-const queue = [];
-const pending = new Map();
-let counterEl = null;
-let stampedCount = 0;
-let timer = null;
-let nextId = 0;
-
-const settings = { enabled: true };
 
 /**
  * Returns the post body. Any element holding ~all of the container's text is a
  * wrapper, not the body, so the body is the longest block strictly below that.
  */
-const readText = (post) => {
+const readLongestBlock = (post) => {
   const total = (post.textContent ?? '').trim().length;
   if (total < MIN_TEXT_LENGTH) return '';
 
@@ -52,7 +32,51 @@ const readText = (post) => {
     }
   }
 
-  const text = ((best ?? post).innerText ?? '').trim();
+  return ((best ?? post).innerText ?? '').trim();
+};
+
+const ADAPTERS = {
+  linkedin: {
+    // LinkedIn hashes every class name and rotates them each build, so the only
+    // durable hook is the componentkey, which still carries the feed type.
+    selectors: [
+      '[componentkey*="FeedType_MAIN_FEED"]',
+      'div.feed-shared-update-v2',            // older layout, harmless if absent
+      'div[data-id^="urn:li:activity"]',
+    ],
+    readText: readLongestBlock,
+    idFor: (post) => post.getAttribute('componentkey'),
+    rootMargin: '400px 0px',
+  },
+  x: {
+    // X keeps stable data-testid hooks. The first tweetText is the post itself;
+    // a second one belongs to a quoted tweet and is ignored.
+    selectors: ['article[data-testid="tweet"]'],
+    readText: (post) =>
+      (post.querySelector('[data-testid="tweetText"]')?.innerText ?? '').trim(),
+    idFor: (post) => post.querySelector('a[href*="/status/"] time')?.closest('a')?.getAttribute('href'),
+    // X scrolls fast. Judge well ahead of the viewport so a killed post is
+    // gone before it arrives.
+    rootMargin: '1200px 0px',
+  },
+};
+
+const PLATFORM = /(^|\.)(x|twitter)\.com$/.test(location.hostname) ? 'x' : 'linkedin';
+const adapter = ADAPTERS[PLATFORM];
+
+const seen = new WeakSet();
+const queue = [];
+const pending = new Map();
+let counterEl = null;
+let stampedCount = 0;
+let killedCount = 0;
+let timer = null;
+let nextId = 0;
+
+const settings = { enabled: true, mode: 'stamp' };
+
+const readText = (post) => {
+  const text = adapter.readText(post);
   return text.length >= MIN_TEXT_LENGTH ? text.slice(0, MAX_TEXT_LENGTH) : '';
 };
 
@@ -62,16 +86,19 @@ const renderCounter = () => {
     counterEl.className = 'slop-counter';
     document.body.appendChild(counterEl);
   }
-  counterEl.textContent = `${stampedCount} stamped`;
+  counterEl.textContent =
+    killedCount > 0 ? `${stampedCount} stamped · ${killedCount} killed` : `${stampedCount} stamped`;
 };
+
+const metaFor = (result) =>
+  result.source === 'local' ? 'rule' : `jev ${(result.score ?? 0).toFixed(2)}`;
 
 const stamp = (post, result) => {
   const word = result.label ?? 'Slop';
-  const score = Math.max(result.slop ?? 0, result.corporate ?? 0);
 
   const mark = document.createElement('div');
   mark.className = 'slop-stamp';
-  mark.dataset.reason = result.reason;
+  mark.dataset.label = word.toLowerCase();
 
   const wordEl = document.createElement('span');
   wordEl.className = 'slop-word';
@@ -79,7 +106,7 @@ const stamp = (post, result) => {
 
   const metaEl = document.createElement('span');
   metaEl.className = 'slop-meta';
-  metaEl.textContent = result.source === 'local' ? 'rule' : `jev ${score.toFixed(2)}`;
+  metaEl.textContent = metaFor(result);
 
   mark.append(wordEl, metaEl);
   // Fit the word to the card and give each stamp its own tilt, so a feed of
@@ -107,13 +134,48 @@ const stamp = (post, result) => {
   renderCounter();
 };
 
+/**
+ * Collapses the post to a one-line bar. The post stays in the DOM so "show"
+ * can bring it back, and so the feed's own virtualisation is not disturbed.
+ */
+const kill = (post, result) => {
+  const bar = document.createElement('div');
+  bar.className = 'slop-killbar';
+  bar.dataset.label = (result.label ?? 'Slop').toLowerCase();
+
+  const text = document.createElement('span');
+  text.textContent = `Killed · ${result.label ?? 'Slop'} · ${metaFor(result)}`;
+
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.textContent = 'show';
+  // Clicks inside a post navigate on X, so keep this one to ourselves.
+  button.addEventListener('click', (event) => {
+    event.preventDefault();
+    event.stopPropagation();
+    bar.remove();
+    post.classList.remove('slop-killed');
+    killedCount -= 1;
+    stamp(post, result);
+  });
+
+  bar.append(text, button);
+  post.classList.add('slop-killed');
+  post.prepend(bar);
+
+  killedCount += 1;
+  renderCounter();
+};
+
 const apply = (results) => {
   for (const result of results) {
     const post = pending.get(result.id);
     pending.delete(result.id);
     if (!post?.isConnected) continue;
     post.classList.remove('slop-pending');
-    if (result.verdict === 'hide') stamp(post, result);
+    if (result.verdict !== 'hide') continue;
+    if (settings.mode === 'kill' && result.kill) kill(post, result);
+    else stamp(post, result);
   }
 };
 
@@ -126,7 +188,10 @@ const flush = async () => {
     const response = await fetch(ENDPOINT, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ posts: batch.map(({ id, text }) => ({ id, text })) }),
+      body: JSON.stringify({
+        platform: PLATFORM,
+        posts: batch.map(({ id, text }) => ({ id, text })),
+      }),
     });
     if (!response.ok) throw new Error(`proxy ${response.status}`);
     const { results } = await response.json();
@@ -154,7 +219,9 @@ const enqueue = (post) => {
   if (text.length < MIN_TEXT_LENGTH) return;
 
   seen.add(post);
-  const id = post.getAttribute('componentkey') ?? `p${nextId++}`;
+  // The same post can render twice on X (timeline + a reply chain), so ids
+  // are made unique per element even when the post id repeats.
+  const id = `${adapter.idFor(post) ?? 'p'}#${nextId++}`;
   pending.set(id, post);
   post.classList.add('slop-pending');
   queue.push({ id, text });
@@ -169,7 +236,7 @@ const observer = new IntersectionObserver(
       enqueue(entry.target);
     }
   },
-  { rootMargin: '400px 0px' }
+  { rootMargin: adapter.rootMargin }
 );
 
 /**
@@ -182,7 +249,7 @@ const outermost = (nodes) =>
 
 const scan = () => {
   const found = new Set();
-  for (const selector of POST_SELECTORS) {
+  for (const selector of adapter.selectors) {
     for (const post of document.querySelectorAll(selector)) found.add(post);
   }
   for (const post of outermost([...found])) {
@@ -190,8 +257,14 @@ const scan = () => {
   }
 };
 
-chrome.storage.sync.get({ enabled: true }, (stored) => {
+// Mode changes apply to the next post judged; no reload needed.
+chrome.storage.onChanged.addListener((changes) => {
+  if (changes.mode) settings.mode = changes.mode.newValue;
+});
+
+chrome.storage.sync.get({ enabled: true, mode: 'stamp' }, (stored) => {
   settings.enabled = stored.enabled;
+  settings.mode = stored.mode;
   if (!settings.enabled) return;
   scan();
   new MutationObserver(scan).observe(document.body, { childList: true, subtree: true });

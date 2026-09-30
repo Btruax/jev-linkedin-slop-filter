@@ -3,25 +3,13 @@
 // who installs it.
 
 import { createServer } from 'node:http';
-import { readFileSync } from 'node:fs';
 import { prefilter } from './prefilter.js';
 import { judge, JevError } from './jev.js';
+import { loadApiKey } from './env.js';
 
 const PORT = Number(process.env.PORT ?? 8787);
 const CACHE_LIMIT = 2000;
 const MAX_BODY_BYTES = 256 * 1024;
-
-const loadApiKey = () => {
-  if (process.env.TYPESAFE_API_KEY) return process.env.TYPESAFE_API_KEY;
-  try {
-    const env = readFileSync(new URL('../.env', import.meta.url), 'utf8');
-    const match = env.match(/^TYPESAFE_API_KEY=(.*)$/m);
-    if (match) return match[1].trim();
-  } catch {
-    // fall through to the explicit error below
-  }
-  throw new Error('TYPESAFE_API_KEY not found in environment or .env');
-};
 
 const API_KEY = loadApiKey();
 const cache = new Map();
@@ -33,20 +21,20 @@ const remember = (key, value) => {
   return value;
 };
 
-const classify = async (text) => {
-  const key = text.slice(0, 500);
+const classify = async (text, platform) => {
+  const key = `${platform}:${text.slice(0, 500)}`;
   if (cache.has(key)) {
     stats.cached += 1;
     return cache.get(key);
   }
 
-  const local = prefilter(text);
+  const local = prefilter(text, platform);
   if (local) {
     stats.local += 1;
     return remember(key, local);
   }
 
-  const result = await judge(text, API_KEY);
+  const result = await judge(platform, text, API_KEY);
   stats.jev += 1;
   return remember(key, result);
 };
@@ -68,9 +56,11 @@ const readBody = (req) =>
     req.on('error', reject);
   });
 
-// The content script calls from https://www.linkedin.com; the popup calls from
-// chrome-extension://<id>. Allow exactly those two and nothing else.
-const ALLOWED_ORIGIN = /^(https:\/\/www\.linkedin\.com|chrome-extension:\/\/[a-p]+)$/;
+// Content scripts call from the feed sites; the popup calls from
+// chrome-extension://<id>. Allow exactly those and nothing else.
+const ALLOWED_ORIGIN =
+  /^(https:\/\/(www\.linkedin|x|twitter|mobile\.x|mobile\.twitter)\.com|chrome-extension:\/\/[a-p]+)$/;
+const PLATFORMS = new Set(['linkedin', 'x']);
 
 const send = (res, status, payload, origin) => {
   const headers = {
@@ -95,7 +85,8 @@ const server = createServer(async (req, res) => {
   }
 
   try {
-    const { posts } = JSON.parse(await readBody(req));
+    const { posts, platform: requested } = JSON.parse(await readBody(req));
+    const platform = PLATFORMS.has(requested) ? requested : 'linkedin';
     if (!Array.isArray(posts)) {
       return send(res, 400, { error: 'Expected { posts: [{ id, text }] }' }, origin);
     }
@@ -103,13 +94,13 @@ const server = createServer(async (req, res) => {
     const results = await Promise.all(
       posts.map(async ({ id, text }) => {
         try {
-          return { id, ...(await classify(String(text ?? ''))) };
+          return { id, ...(await classify(String(text ?? ''), platform)) };
         } catch (error) {
           stats.errors += 1;
           const isJev = error instanceof JevError;
           console.error(`[judge] ${id}: ${error.message}`);
           // Fail open. A broken judgment must never hide a real post.
-          return { id, verdict: 'show', reason: isJev ? 'jev_error' : 'error' };
+          return { id, verdict: 'show', kill: false, reason: isJev ? 'jev_error' : 'error' };
         }
       })
     );
