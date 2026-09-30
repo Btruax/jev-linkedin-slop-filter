@@ -35,6 +35,22 @@ Then in Chrome:
 
 The popup shows how many posts were judged and whether the proxy is connected.
 
+### Keep it running (macOS)
+
+`npm start` stops when the terminal closes. To run the proxy all the time as a
+launchd agent (starts at login, restarts if it crashes):
+
+```bash
+scripts/launchd.sh install     # also re-run after changing server/ or .env
+scripts/launchd.sh status
+scripts/launchd.sh uninstall
+```
+
+`install` copies `server/` and `.env` to `~/.slop-filter/` and runs it from
+there, because macOS privacy protection often blocks background jobs from
+reading `~/Documents`. Logs, including one line per flagged post, are in
+`~/.slop-filter/logs/`.
+
 ## Why a local server
 
 Anything bundled into a Chrome extension is readable by everyone who installs
@@ -139,6 +155,7 @@ honours `prefers-reduced-motion`.
 
 ```
 extension/   Chrome MV3 extension (content script, popup, stamp CSS, icons)
+scripts/     launchd.sh: run the proxy permanently on macOS
 server/      Local proxy: holds the key, runs local rules, calls Jev
 test/        Labelled samples, calibration runner, unit tests, stamp preview
 ```
