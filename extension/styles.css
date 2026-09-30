@@ -13,7 +13,7 @@
   --slop-slam: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.slop-stamped {
+[data-slop="stamped"] {
   position: relative;
   animation: slop-impact 360ms ease-out 150ms both;
 }
@@ -122,7 +122,7 @@
 
 /* Kill mode: everything but our bar disappears. The post stays in the DOM so
    "show" can restore it and the feed's virtualised list keeps its nodes. */
-.slop-killed > :not(.slop-killbar) { display: none !important; }
+[data-slop="killed"] > :not(.slop-killbar) { display: none !important; }
 
 .slop-killbar {
   display: flex;
@@ -152,7 +152,7 @@
 .slop-killbar button:hover,
 .slop-killbar button:focus-visible { opacity: 1; }
 
-.slop-pending { opacity: 0.6; transition: opacity 160ms ease-out; }
+[data-slop="pending"] { opacity: 0.6; transition: opacity 160ms ease-out; }
 
 .slop-counter {
   position: fixed;
@@ -170,7 +170,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .slop-stamped { animation: none; }
+  [data-slop="stamped"] { animation: none; }
   .slop-stamp { animation: slop-fade 200ms ease-out both; }
   .slop-stamp::after { animation: none; opacity: 0; }
   @keyframes slop-fade {

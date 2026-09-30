@@ -64,6 +64,14 @@ const ADAPTERS = {
 const PLATFORM = /(^|\.)(x|twitter)\.com$/.test(location.hostname) ? 'x' : 'linkedin';
 const adapter = ADAPTERS[PLATFORM];
 
+// Post state lives in a data attribute, not a class. X is React, and React
+// rewrites an element's whole className on re-render, which silently undid
+// kills (the bar stayed, the post came back). It leaves unknown attributes alone.
+const setState = (post, state) => {
+  if (state) post.dataset.slop = state;
+  else delete post.dataset.slop;
+};
+
 const seen = new WeakSet();
 const queue = [];
 const pending = new Map();
@@ -117,7 +125,7 @@ const stamp = (post, result) => {
   mark.style.setProperty('--stamp-size', `${Math.round(size)}px`);
   mark.style.setProperty('--stamp-tilt', `${tilt}deg`);
 
-  post.classList.add('slop-stamped');
+  setState(post, 'stamped');
   post.appendChild(mark);
 
   // Rotation widens the footprint, so the estimate above can still overhang the
@@ -154,13 +162,13 @@ const kill = (post, result) => {
     event.preventDefault();
     event.stopPropagation();
     bar.remove();
-    post.classList.remove('slop-killed');
+    setState(post, null);
     killedCount -= 1;
     stamp(post, result);
   });
 
   bar.append(text, button);
-  post.classList.add('slop-killed');
+  setState(post, 'killed');
   post.prepend(bar);
 
   killedCount += 1;
@@ -172,7 +180,7 @@ const apply = (results) => {
     const post = pending.get(result.id);
     pending.delete(result.id);
     if (!post?.isConnected) continue;
-    post.classList.remove('slop-pending');
+    setState(post, null);
     if (result.verdict !== 'hide') continue;
     if (settings.mode === 'kill' && result.kill) kill(post, result);
     else stamp(post, result);
@@ -200,7 +208,8 @@ const flush = async () => {
     // Fail open: leave every post visible and stop pulsing it.
     console.warn('[slop-filter] proxy unreachable —', error.message);
     for (const { id } of batch) {
-      pending.get(id)?.classList.remove('slop-pending');
+      const post = pending.get(id);
+      if (post) setState(post, null);
       pending.delete(id);
     }
   }
@@ -223,7 +232,7 @@ const enqueue = (post) => {
   // are made unique per element even when the post id repeats.
   const id = `${adapter.idFor(post) ?? 'p'}#${nextId++}`;
   pending.set(id, post);
-  post.classList.add('slop-pending');
+  setState(post, 'pending');
   queue.push({ id, text });
   schedule();
 };
