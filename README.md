@@ -51,6 +51,10 @@ there, because macOS privacy protection often blocks background jobs from
 reading `~/Documents`. Logs, including one line per flagged post, are in
 `~/.slop-filter/logs/`.
 
+It shows up in Activity Monitor and `ps` as **jev-slop-filter-proxy** (launchd
+label `com.jev-slop-filter-proxy`), not as a bare `node`, so it is easy to
+recognise and leave alone.
+
 ## Why a local server
 
 Anything bundled into a Chrome extension is readable by everyone who installs

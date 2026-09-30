@@ -11,12 +11,15 @@
 
 set -euo pipefail
 
-LABEL="com.slopfilter.server"
+LABEL="com.jev-slop-filter-proxy"
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 DEST="$HOME/.slop-filter"
 PLIST="$HOME/Library/LaunchAgents/$LABEL.plist"
 DOMAIN="gui/$(id -u)"
 PORT=8787
+# The name macOS shows in Activity Monitor, `ps` and Login Items. A bare
+# `node` there looks like a stray process and invites being killed.
+PROC_NAME="jev-slop-filter-proxy"
 
 stop_agent() {
   launchctl bootout "$DOMAIN/$LABEL" 2>/dev/null || true
@@ -37,7 +40,11 @@ install() {
   [ -f "$REPO/.env" ] || { echo "missing $REPO/.env (copy .env.example and add your key)" >&2; exit 1; }
   grep -q '^TYPESAFE_API_KEY=your_key' "$REPO/.env" && { echo ".env still has the placeholder key" >&2; exit 1; }
 
-  mkdir -p "$DEST/server" "$DEST/logs" "$(dirname "$PLIST")"
+  mkdir -p "$DEST/server" "$DEST/logs" "$DEST/bin" "$(dirname "$PLIST")"
+  # macOS names a process after the executable it ran, and resolves symlinks
+  # first, so the node binary is hard-linked (copied if that fails) under
+  # the proxy's own name. Re-running install refreshes it after a node update.
+  ln -f "$node" "$DEST/bin/$PROC_NAME" 2>/dev/null || cp -f "$node" "$DEST/bin/$PROC_NAME"
   cp "$REPO"/server/*.js "$REPO/server/package.json" "$DEST/server/"
   cp "$REPO/.env" "$DEST/.env"
   chmod 600 "$DEST/.env"
@@ -46,11 +53,14 @@ install() {
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
+<!-- Jev Slop Filter: local proxy for the LinkedIn/X slop filter browser
+     extension. Holds the TypeSafe API key and calls Jev. Safe to leave running.
+     Remove with: $REPO/scripts/launchd.sh uninstall -->
 <dict>
   <key>Label</key><string>$LABEL</string>
   <key>ProgramArguments</key>
   <array>
-    <string>$node</string>
+    <string>$DEST/bin/$PROC_NAME</string>
     <string>$DEST/server/index.js</string>
   </array>
   <key>WorkingDirectory</key><string>$DEST/server</string>

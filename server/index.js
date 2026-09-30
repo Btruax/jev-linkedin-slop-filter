@@ -7,6 +7,9 @@ import { prefilter } from './prefilter.js';
 import { judge, JevError } from './jev.js';
 import { loadApiKey } from './env.js';
 
+// Shows in `ps` even when started with plain `npm start`.
+process.title = 'jev-slop-filter-proxy';
+
 const PORT = Number(process.env.PORT ?? 8787);
 const CACHE_LIMIT = 2000;
 const MAX_BODY_BYTES = 256 * 1024;
