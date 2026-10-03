@@ -6,12 +6,14 @@
   --slop-bait: #d4183d;
   --slop-brag: #b45309;
   --slop-corp: #1d4ed8;
+  --slop-ai: #7c3aed;
+  --slop-shill: #047857;
   --slop-ink: 0.97;
   --slop-tilt: -11deg;
   --slop-slam: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.slop-stamped {
+[data-slop="stamped"] {
   position: relative;
   animation: slop-impact 360ms ease-out 150ms both;
 }
@@ -60,8 +62,10 @@
   animation: slop-ring 420ms ease-out 190ms both;
 }
 
-.slop-stamp[data-reason="humblebrag"] { color: var(--slop-brag); }
-.slop-stamp[data-reason="corporate"]  { color: var(--slop-corp); }
+.slop-stamp[data-label="brag"],  .slop-killbar[data-label="brag"]  { color: var(--slop-brag); }
+.slop-stamp[data-label="corp"],  .slop-killbar[data-label="corp"]  { color: var(--slop-corp); }
+.slop-stamp[data-label="ai"],    .slop-killbar[data-label="ai"]    { color: var(--slop-ai); }
+.slop-stamp[data-label="shill"], .slop-killbar[data-label="shill"] { color: var(--slop-shill); }
 
 .slop-word {
   /* Sized in JS against the post width so long words never overflow the card. */
@@ -116,7 +120,40 @@
   100% { transform: translate3d(0, 0, 0) rotate(0deg); }
 }
 
-.slop-pending { opacity: 0.6; transition: opacity 160ms ease-out; }
+/* Kill mode: everything but our bar disappears. The post stays in the DOM so
+   "show" can restore it and the feed's virtualised list keeps its nodes. */
+[data-slop="killed"] > :not(.slop-killbar) { display: none !important; }
+
+.slop-killbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 6px 0;
+  padding: 11px 16px;
+  color: var(--slop-bait);
+  background: color-mix(in srgb, currentColor 14%, #fffcf6);
+  border: 2px solid currentColor;
+  border-radius: 8px;
+  font: 800 13px/1.3 "Helvetica Neue", Inter, system-ui, sans-serif;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.slop-killbar button {
+  all: unset;
+  cursor: pointer;
+  padding: 4px 12px;
+  border: 2px solid currentColor;
+  border-radius: 999px;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+}
+
+.slop-killbar button:hover,
+.slop-killbar button:focus-visible { background: color-mix(in srgb, currentColor 18%, transparent); }
+
+[data-slop="pending"] { opacity: 0.6; transition: opacity 160ms ease-out; }
 
 .slop-counter {
   position: fixed;
@@ -134,7 +171,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .slop-stamped { animation: none; }
+  [data-slop="stamped"] { animation: none; }
   .slop-stamp { animation: slop-fade 200ms ease-out both; }
   .slop-stamp::after { animation: none; opacity: 0; }
   @keyframes slop-fade {

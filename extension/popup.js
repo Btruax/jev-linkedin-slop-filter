@@ -1,17 +1,24 @@
 const STATS_URL = 'http://127.0.0.1:8787/stats';
 
 const box = document.getElementById('enabled');
+const killBox = document.getElementById('kill');
 const dot = document.getElementById('dot');
 const status = document.getElementById('status');
 const judged = document.getElementById('judged');
 const split = document.getElementById('split');
 
-chrome.storage.sync.get({ enabled: true }, ({ enabled }) => {
+chrome.storage.sync.get({ enabled: true, mode: 'stamp' }, ({ enabled, mode }) => {
   box.checked = enabled;
+  killBox.checked = mode === 'kill';
 });
 
 box.addEventListener('change', () => {
   chrome.storage.sync.set({ enabled: box.checked });
+});
+
+// Only confident judgments kill; the rest are still stamped.
+killBox.addEventListener('change', () => {
+  chrome.storage.sync.set({ mode: killBox.checked ? 'kill' : 'stamp' });
 });
 
 const showOffline = () => {

@@ -1,0 +1,58 @@
+[
+ {
+  "kind": "ambiguous",
+  "text": "Something I got wrong for years:\n\nI thought code review was about finding bugs.\n\nIt isn't. It's about spreading context.\n\nThe bugs you catch in review are the cheap ones. The expensive ones need tests.\n\nBut the knowledge transfer? That only happens in review.\n\nChanged how I review entirely."
+ },
+ {
+  "kind": "genuine",
+  "text": "Proud to share that our team just shipped the new payments dashboard after 8 months of work. Huge credit to the four engineers who carried this. It now handles 40k merchants and cut support tickets by about 30%. Genuinely the hardest thing I've worked on."
+ },
+ {
+  "kind": "ambiguous",
+  "text": "Most engineering managers optimise for velocity. The good ones optimise for the half-life of a decision. If a choice takes two weeks to make and six months to reverse, you've mispriced the meeting. I've been thinking about this since a conversation with a colleague last month and haven't fully worked it out yet."
+ },
+ {
+  "kind": "promo",
+  "text": "We are excited to announce that Acme has been recognised as a Leader in the 2026 Gartner Magic Quadrant. This recognition reflects our relentless commitment to customer success and innovation. Thank you to our incredible team and our customers for making this possible. #Gartner #Leadership"
+ },
+ {
+  "kind": "genuine",
+  "text": "Layoffs hit our team yesterday. 12 people, some of whom I hired. I don't have a lesson or a takeaway. It was a bad day and I'm still processing it. If you're hiring for data engineering in Pune, DM me and I'll send you names of people who deserve better than this."
+ },
+ {
+  "kind": "bait",
+  "text": "Your network is your net worth.\n\nBut here's what nobody tells you:\n\nIt's not about who you know.\n\nIt's about who knows what you're good at.\n\nSpent 12 years learning this the hard way.\n\nWhat's your take? 👇"
+ },
+ {
+  "kind": "promo",
+  "text": "We are thrilled to announce our Series B! $40M led by Accel, with participation from our existing investors. This milestone is a testament to our team's relentless execution and our customers' trust. We're just getting started. #SeriesB #Startup #Growth"
+ },
+ {
+  "kind": "promo",
+  "text": "Acme is proud to be certified a Great Place to Work for the third year running. Our people are our greatest asset. Thank you to every single Acmer for making this culture what it is. We're hiring! #GPTW #Culture #Hiring"
+ },
+ {
+  "kind": "ai",
+  "text": "In today's rapidly evolving landscape, leadership isn't about having all the answers — it's about asking the right questions. 🌟\n\nHere are 3 lessons I've learned:\n\n1️⃣ Empathy is a superpower.\n2️⃣ Consistency beats intensity.\n3️⃣ Growth happens outside your comfort zone.\n\nWhat would you add? 👇"
+ },
+ {
+  "kind": "ai",
+  "text": "I'm humbled and honored to share that I've been selected to speak at the Global Innovation Summit. This opportunity is a testament to the incredible journey I've been on, and I'm deeply grateful to everyone who has supported me along the way. Let's continue to delve into the future together! 🚀"
+ },
+ {
+  "kind": "ai",
+  "text": "AI isn't replacing jobs — it's redefining them. The professionals who thrive will be those who embrace change, harness the power of new tools, and unlock new levels of productivity. The future belongs to the adaptable. Are you ready? 💡"
+ },
+ {
+  "kind": "ai",
+  "text": "What a fantastic insight! This really resonates with me. The intersection of technology and humanity is where true innovation happens. Thank you for sharing this valuable perspective! 🙌"
+ },
+ {
+  "kind": "genuine",
+  "text": "We moved our invoicing from spreadsheets to a script that reads the dispatch export and builds the invoices. Month-end close went from 3 days to about 4 hours. The hard part was not the code, it was getting everyone to agree on which system is the source of truth for the rate."
+ },
+ {
+  "kind": "genuine",
+  "text": "Looking for recommendations: we need a mobile-friendly e-signature tool that works for field techs with bad signal. DocuSign has been fine at the desk but painful in a parking lot. What are you using?"
+ }
+]
