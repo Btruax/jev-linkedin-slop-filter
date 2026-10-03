@@ -6,6 +6,10 @@ const BATCH_SIZE = 8;
 const BATCH_DELAY_MS = 350;
 const MIN_TEXT_LENGTH = 40;
 const MAX_TEXT_LENGTH = 3000;
+// Below this a post is not really on screen. Brave's ad blocker hides
+// promoted posts with display:none and leaves a 2px wrapper behind; judging
+// those costs a Jev call and centres a stamp on the gap between two posts.
+const MIN_RENDERED_HEIGHT = 40;
 
 // Scored with textContent (cheap, no reflow); the winner is re-read with
 // innerText because the line breaks are a slop signal in their own right.
@@ -82,6 +86,8 @@ let timer = null;
 let nextId = 0;
 
 const settings = { enabled: true, mode: 'stamp' };
+
+const isRendered = (post) => post.getBoundingClientRect().height >= MIN_RENDERED_HEIGHT;
 
 const readText = (post) => {
   const text = adapter.readText(post);
@@ -181,7 +187,8 @@ const apply = (results) => {
     pending.delete(result.id);
     if (!post?.isConnected) continue;
     setState(post, null);
-    if (result.verdict !== 'hide') continue;
+    // Hidden since it was queued (an ad blocker got to it): nothing to mark.
+    if (result.verdict !== 'hide' || !isRendered(post)) continue;
     if (settings.mode === 'kill' && result.kill) kill(post, result);
     else stamp(post, result);
   }
@@ -224,6 +231,8 @@ const schedule = () => {
 
 const enqueue = (post) => {
   if (seen.has(post) || !settings.enabled) return;
+  // Not marked seen, so the next DOM change re-observes it in case it renders.
+  if (!isRendered(post)) return;
   const text = readText(post);
   if (text.length < MIN_TEXT_LENGTH) return;
 
